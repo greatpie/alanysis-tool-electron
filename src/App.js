@@ -1,5 +1,8 @@
 import React, { useState } from 'react'
 import ReactECharts from 'echarts-for-react'
+import * as echarts from 'echarts'
+import ecStat from 'echarts-stat'
+
 import PropTypes from 'prop-types'
 import { makeStyles } from '@material-ui/core/styles'
 import { Container, AppBar, Tabs, Tab, Typography, Box, Grid, Paper, TextField, Button, InputLabel, FormControl, Input } from '@material-ui/core'
@@ -74,7 +77,7 @@ function a11yProps(index) {
 
 // DataForm
 function DataForm(props) {
-  const { index, className, da1, da2, ppm, stdRatio } = props
+  const { index, className, da1, da2, ppm, stdRatio, statData, setStatData } = props
 
   const [concentration, setConcentration] = useState(0)
   const [fileName, setFileName] = useState('选择文件')
@@ -93,7 +96,7 @@ function DataForm(props) {
     return intensity
   }
 
-  function getRateList(filePaths) {
+  async function getRateMean(filePaths) {
     let taskList = []
     filePaths.forEach(filePath => {
 
@@ -116,7 +119,7 @@ function DataForm(props) {
 
     })
 
-    Promise.all(taskList).then((rateList) => {
+    await Promise.all(taskList).then((rateList) => {
       let rateStd = std(rateList)
       let rateMean = mean(rateList)
       let rateListFiltered = rateList.filter(rate => abs(rate - rateMean) <= multiply(rateStd, stdRatio))
@@ -125,9 +128,9 @@ function DataForm(props) {
       let cv = divide(rateStd, rateMean)
       setRateMean(rateMean)
       setCV(cv)
+      setStatData([...statData, [concentration, rateMean]])
+      console.log(statData)
     })
-
-
 
   }
   function handleDataClick(e) {
@@ -144,7 +147,8 @@ function DataForm(props) {
       if (!result.canceled) {
         const filePath = result.filePaths[0]
         setFileName(path.parse(filePath)['name'])
-        getRateList(result.filePaths)
+        getRateMean(result.filePaths)
+        
       }
 
     }).catch(err => {
@@ -167,16 +171,13 @@ function DataForm(props) {
 }
 
 function LinearChart(props) {
+  const {statData} = props
+  const [option,setOption] = useState({})
   function getOption() {
-    let data = [
-      [0.067732, 3.176513],
-      [0.42781, 3.816464],
-      [0.995731, 4.550095],
-      [0.116163, 3.129283]
-    ];
+    
     let option = {
       dataset: [{
-        source: data
+        source: statData
       }, {
         transform: {
           type: 'ecStat:regression'
@@ -229,8 +230,14 @@ function LinearChart(props) {
     };
     return option;
   }
+  function getEcharts() {
+    echarts.registerTransform(ecStat.transform.regression)
+    return echarts
+  }
+
   return (<ReactECharts
     option={getOption()}
+    echarts={getEcharts()}
   />)
 }
 
@@ -241,6 +248,7 @@ export default function App() {
   const [da2, setDa2] = useState(0)
   const [ppm, setPpm] = useState(0)
   const [stdRatio, setStdRatio] = useState(1)
+  const [statData, setStatData] = useState([])
   const handleChange = (event, newValue) => {
     setValue(newValue)
   }
@@ -296,7 +304,7 @@ export default function App() {
 
           <container>
             {Array.from({ length: 10 }, (value, index) =>
-              <DataForm index={index} className={classes.customForm} da1={da1} da2={da2} ppm={ppm} stdRatio={stdRatio}></DataForm>
+              <DataForm index={index} className={classes.customForm} da1={da1} da2={da2} ppm={ppm} stdRatio={stdRatio} statData={statData} setStatData={setStatData}></DataForm>
             )}
           </container>
 
@@ -319,7 +327,7 @@ export default function App() {
 
 
           <Paper square>
-            {/* <LinearChart></LinearChart> */}
+            <LinearChart statData={statData}></LinearChart>
           </Paper>
 
         </TabPanel>
