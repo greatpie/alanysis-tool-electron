@@ -206,14 +206,14 @@ function LinearChart(props) {
 
     return (<Container>
         <Grid container spacing={3}>
-            <Grid item xs={2}>
-                <span>斜率：{gradient}</span>
+            <Grid item xs={3}>
+                <span>斜率：{gradient.toPrecision(5)}</span>
             </Grid>
-            <Grid item xs={2}>
-                <span>截距：{intercept}</span>
+            <Grid item xs={3}>
+                <span>截距：{intercept.toPrecision(5)}</span>
             </Grid>
-            <Grid item xs={2}>
-                <span>R^2：{R_square}</span>
+            <Grid item xs={3}>
+                <span>R^2：{R_square.toPrecision(5)}</span>
             </Grid>
 
         </Grid>
