@@ -1,3 +1,10 @@
+/*
+ * @Author: greatpie
+ * @Date: 2021-07-08 06:00:46
+ * @LastEditTime: 2021-07-12 10:29:11
+ * @LastEditors: greatpie
+ * @FilePath: /alanysis-tool-electron/src/theme.js
+ */
 import { red } from '@material-ui/core/colors';
 import { createTheme } from '@material-ui/core/styles';
 
@@ -20,3 +27,4 @@ const theme = createTheme({
 });
 
 export default theme;
+ 

@@ -1,9 +1,9 @@
 /*
  * @Author: greatpie
  * @Date: 2021-07-09 20:07:41
- * @LastEditTime: 2021-07-09 22:11:13
+ * @LastEditTime: 2021-07-11 23:15:57
  * @LastEditors: greatpie
- * @FilePath: /create-react-app/main.js
+ * @FilePath: /alanysis-tool-electron/main.js
  */
 const { app, BrowserWindow } = require('electron')
 const isDev = require('electron-is-dev')

@@ -129,7 +129,6 @@ function DataForm(props) {
       setRateMean(rateMean)
       setCV(cv)
       setStatData([...statData, [concentration, rateMean]])
-      console.log(statData)
     })
 
   }

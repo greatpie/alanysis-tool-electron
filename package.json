@@ -3,6 +3,7 @@
   "version": "4.0.0",
   "private": true,
   "main": "main.js",
+  "author":"pie",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
