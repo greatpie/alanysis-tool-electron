@@ -2,10 +2,8 @@ import React, { useState } from 'react'
 import ReactECharts from 'echarts-for-react'
 import * as echarts from 'echarts'
 import ecStat from 'echarts-stat'
-
-import PropTypes from 'prop-types'
 import { makeStyles } from '@material-ui/core/styles'
-import { Container, AppBar, Tabs, Tab, Typography, Box, Grid, Paper, TextField, Button, InputLabel, FormControl, Input } from '@material-ui/core'
+import { Container,  Grid, Paper, TextField, Button, InputLabel, FormControl, Input } from '@material-ui/core'
 import { divide, mean, std, abs, multiply, square } from 'mathjs'
 
 // electron remote
