@@ -128,7 +128,9 @@ function DataForm(props) {
       let cv = divide(rateStd, rateMean)
       setRateMean(rateMean)
       setCV(cv)
-      setStatData([...statData, [concentration, rateMean]])
+    
+      setStatData([...statData, [rateMean,parseFloat(concentration)]])
+      console.log(statData)
     })
 
   }
@@ -186,8 +188,6 @@ function LinearChart(props) {
       }],
       title: {
         text: 'Linear Regression',
-        subtext: 'By ecStat.regression',
-        sublink: 'https://github.com/ecomfe/echarts-stat',
         left: 'center'
       },
       legend: {
@@ -309,7 +309,7 @@ export default function App() {
 
 
 
-          <Grid container spacing={3} className={classes.submitBtns}>
+          {/* <Grid container spacing={3} className={classes.submitBtns}>
             <Grid item xs={3}>
               <Button variant="contained" color="primary" size='large'>
                 计  算
@@ -322,7 +322,7 @@ export default function App() {
               </Button>
             </Grid>
 
-          </Grid>
+          </Grid> */}
 
 
           <Paper square>

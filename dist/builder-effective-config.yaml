@@ -1,0 +1,36 @@
+directories:
+  output: dist
+  buildResources: assets
+appId: tigerHee appId
+productName: electron脚手架
+copyright: Copyright © 2019 ${author}
+files:
+  - filter:
+      - build/**/*
+      - node_modules/**/*
+      - package.json
+      - main.js
+extends: null
+mac:
+  category: public.app-category.productivity
+  artifactName: ${productName}-${version}-${arch}.${ext}
+dmg:
+  iconSize: 100
+  contents:
+    - x: 130
+      'y': 220
+    - x: 410
+      'y': 220
+      type: link
+      path: /Applications
+win:
+  target:
+    - nsis
+    - msi
+linux:
+  target:
+    - deb
+    - rpm
+    - AppImage
+  category: Development
+electronVersion: 13.1.6

@@ -1,7 +1,7 @@
 /*
  * @Author: greatpie
  * @Date: 2021-07-09 20:07:41
- * @LastEditTime: 2021-07-11 23:15:57
+ * @LastEditTime: 2021-07-12 10:53:46
  * @LastEditors: greatpie
  * @FilePath: /alanysis-tool-electron/main.js
  */
@@ -24,7 +24,7 @@ app.on('ready', () => {
             preload: path.join(__dirname, 'preload.js')
         }
     })
-    const urlLocation = isDev ? 'http://localhost:3000' : 'dummyurl'
+    const urlLocation = isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, "./build/index.html")}`
     mainWindow.loadURL(urlLocation)
     mainWindow.webContents.openDevTools()
 })
