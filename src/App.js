@@ -6,7 +6,7 @@ import ecStat from 'echarts-stat'
 import PropTypes from 'prop-types'
 import { makeStyles } from '@material-ui/core/styles'
 import { Container, AppBar, Tabs, Tab, Typography, Box, Grid, Paper, TextField, Button, InputLabel, FormControl, Input } from '@material-ui/core'
-import { divide, mean, std, abs, multiply } from 'mathjs'
+import { divide, mean, std, abs, multiply, square } from 'mathjs'
 
 // electron remote
 const electron = window.require('electron');
@@ -128,8 +128,8 @@ function DataForm(props) {
       let cv = divide(rateStd, rateMean)
       setRateMean(rateMean)
       setCV(cv)
-    
-      setStatData([...statData, [rateMean,parseFloat(concentration)]])
+
+      setStatData([...statData, [rateMean, parseFloat(concentration)]])
       console.log(statData)
     })
 
@@ -149,7 +149,7 @@ function DataForm(props) {
         const filePath = result.filePaths[0]
         setFileName(path.parse(filePath)['name'])
         getRateMean(result.filePaths)
-        
+
       }
 
     }).catch(err => {
@@ -172,10 +172,43 @@ function DataForm(props) {
 }
 
 function LinearChart(props) {
-  const {statData} = props
-  const [option,setOption] = useState({})
+  const { statData } = props
+  const [gradient_s, setGradient] = useState(0)
+  const [intercept_s, setintercept] = useState(0)
+  const [R_square_s, setR_square] = useState(0)
+  
+  function getStatParam() {
+    if (statData.length > 0) {
+      let myRegression = ecStat.regression('linear', statData)
+      let gradient = myRegression.parameter['gradient']
+      let intercept = myRegression.parameter['intercept']
+
+      let y_matrix = []
+      let f_matrix = []
+      statData.forEach(item => {
+        let f = item[0] * gradient + intercept
+        y_matrix.push(item[1])
+        f_matrix.push(f)
+
+      })
+      let y_mean = mean(y_matrix)
+      let SS_tot = 0
+      let SS_res = 0
+      for (let i = 0; i < y_matrix.length; i++) {
+        SS_tot = square(y_matrix[i] - y_mean)
+        SS_res = square(y_matrix[i] - f_matrix[i])
+      }
+      let R_square = 1 - divide(SS_res, SS_tot)
+
+      // setGradient(gradient)
+      // setintercept(intercept)
+      // setR_square(R_square)
+    }
+
+  }
+
   function getOption() {
-    
+    getStatParam()
     let option = {
       dataset: [{
         source: statData
@@ -234,10 +267,27 @@ function LinearChart(props) {
     return echarts
   }
 
-  return (<ReactECharts
-    option={getOption()}
-    echarts={getEcharts()}
-  />)
+  return (<Container>
+    <Grid container spacing={3}>
+      <Grid item xs={2}>
+        <span>斜率：{gradient_s}</span>
+      </Grid>
+      <Grid item xs={2}>
+        <span>截距：{intercept_s}</span>
+      </Grid>
+      <Grid item xs={2}>
+        <span>R^2：{R_square_s}</span>
+      </Grid>
+    
+    </Grid>
+
+    
+  
+
+    <ReactECharts
+      option={getOption()}
+      echarts={getEcharts()}
+    /></Container>)
 }
 
 export default function App() {
@@ -326,6 +376,7 @@ export default function App() {
 
 
           <Paper square>
+
             <LinearChart statData={statData}></LinearChart>
           </Paper>
 
