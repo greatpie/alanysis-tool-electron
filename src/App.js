@@ -1,7 +1,7 @@
 /*
  * @Author: greatpie
  * @Date: 2021-07-08 06:00:46
- * @LastEditTime: 2021-07-12 14:15:21
+ * @LastEditTime: 2021-07-12 17:02:52
  * @LastEditors: greatpie
  * @FilePath: /alanysis-tool-electron/src/App.js
  */
@@ -9,10 +9,12 @@ import React, { useState } from 'react'
 
 import PropTypes from 'prop-types'
 import { makeStyles } from '@material-ui/core/styles'
-import { Container, AppBar, Tabs, Tab, Typography, Box} from '@material-ui/core'
+import { Container, AppBar, Tabs, Tab, Typography, Box } from '@material-ui/core'
 
 
 import TabOne from './TabOne'
+import { StatContext } from './content-manager'
+import TabTwo from './TabTwo'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -81,25 +83,36 @@ export default function App() {
     setValue(newValue)
   }
 
+  const [gradient, setGradient] = useState(0)
+  const [intercept, setintercept] = useState(0)
+  const [R_square, setR_square] = useState(0)
+  const [stdRatio,setStdRatio] = useState(2)
+  const [params,setParams] = useState({
+    'gradient':1,
+    'intercept':1,
+    'R_square':0,
+  })
   return (
-    <div className={classes.root}>
-      <Container maxWidth="md">
-        <AppBar position="static">
-          <Tabs value={value} onChange={handleChange} aria-label="simple tabs">
-            <Tab label="标准曲线分析" {...a11yProps(0)} />
-            <Tab label="定量分析" {...a11yProps(1)} />
+    <StatContext.Provider value={{ params, setParams, stdRatio, setStdRatio}}>
+      <div className={classes.root}>
+        <Container maxWidth="md">
+          <AppBar position="static">
+            <Tabs value={value} onChange={handleChange} aria-label="simple tabs">
+              <Tab label="标准曲线分析" {...a11yProps(0)} />
+              <Tab label="定量分析" {...a11yProps(1)} />
 
-          </Tabs>
-        </AppBar>
-        <TabPanel value={value} index={0}>
-        <TabOne></TabOne>
-        </TabPanel>
-        <TabPanel value={value} index={1}>
-          定量分析
-        </TabPanel>
-      </Container>
+            </Tabs>
+          </AppBar>
+          <TabPanel value={value} index={0}>
+            <TabOne></TabOne>
+          </TabPanel>
+          <TabPanel value={value} index={1}>
+            <TabTwo></TabTwo>
+          </TabPanel>
+        </Container>
 
-    </div>
+      </div></StatContext.Provider>
+
   );
 }
 

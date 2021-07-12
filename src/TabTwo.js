@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useState, useContext } from 'react'
 import ReactECharts from 'echarts-for-react'
 import * as echarts from 'echarts'
 import ecStat from 'echarts-stat'
@@ -42,12 +42,14 @@ const useStyles = makeStyles((theme) => ({
 
 // DataForm
 function DataForm(props) {
-    const { index, className, da1, da2, ppm, stdRatio, statData, setStatData } = props
-
+    const { index, className, da1, da2, ppm, dilutionRatio,statData,setStatData} = props
     const [concentration, setConcentration] = useState(0)
+    const [inputConcentration, setInputConcentration] = useState(0)
+    const [relativeDeviation, setRelativeDeviation] = useState(0)
     const [fileName, setFileName] = useState('选择文件')
     const [rateMean, setRateMean] = useState(0)
     const [CV, setCV] = useState(0)
+    const { params, stdRatio } = useContext(StatContext)
     function searchIntensity(da, dataList) {
         let intensity = 0
         let range = ppm / 1000000
@@ -91,20 +93,23 @@ function DataForm(props) {
             rateStd = std(rateListFiltered)
             rateMean = mean(rateListFiltered)
             let cv = divide(rateStd, rateMean)
+            let concentration = (params['gradient'] * rateMean + params['intercept']) * dilutionRatio
             setRateMean(rateMean)
             setCV(cv)
+            setConcentration(concentration)
 
-            setStatData([...statData, [rateMean, parseFloat(concentration)]])
-            console.log(statData)
         })
 
     }
-
-
+    function handleInputConcChange(e) {
+        e.preventDefault()
+        setInputConcentration(e.target.value)
+        setRelativeDeviation(divide(concentration - inputConcentration, inputConcentration))
+        setStatData([...statData, [parseFloat(inputConcentration), parseFloat(concentration)]])
+    }
     function handleDataClick(e) {
 
         e.preventDefault()
-
 
         dialog.showOpenDialog({
             title: "请选择对应数据",
@@ -114,7 +119,6 @@ function DataForm(props) {
             properties: ['openFile', 'multiSelections']
         }).then(result => {
             if (!result.canceled) {
-
                 const filePath = result.filePaths[0]
                 setFileName(path.parse(filePath)['name'])
                 getRateMean(result.filePaths)
@@ -126,26 +130,33 @@ function DataForm(props) {
         })
 
     }
+
     return (<form key={index} className={className} noValidate autoComplete="off">
         <Grid container spacing={3}>
-            <Grid item xs={3}><TextField className="concentration" label='浓度' value={concentration} onChange={e => setConcentration(e.target.value)} variant="outlined" />
+
+            <Grid item xs={2}><TextField className="data" label='数据' value={fileName} variant="outlined" onClick={handleDataClick} />
             </Grid>
-            <Grid item xs={3}><TextField className="data" label='数据' value={fileName} variant="outlined" onClick={handleDataClick} />
-            </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={2}>
                 <TextField className="rate" label='比值' value={rateMean} variant="outlined" /></Grid>
-            <Grid item xs={3}>
+            <Grid item xs={2}>
                 <TextField className="CV" label='CV' value={CV} variant="outlined" /></Grid>
+            <Grid item xs={2}><TextField label='实测浓度' value={concentration} variant="outlined" />
+            </Grid>
+            <Grid item xs={2}><TextField label='对标浓度' value={inputConcentration} onChange={handleInputConcChange} variant="outlined" />
+            </Grid>
+            <Grid item xs={2}><TextField label='相对偏差' value={relativeDeviation} variant="outlined" />
+            </Grid>
         </Grid>
     </form>)
 }
 
 function LinearChart(props) {
-    const { statData, gradient,intercept,R_square} = props
-    
+    const { statData,gradient,intercept,R_square} = props
+  
+
 
     function getOption() {
-        
+
         let option = {
             dataset: [{
                 source: statData
@@ -206,20 +217,17 @@ function LinearChart(props) {
 
     return (<Container>
         <Grid container spacing={3}>
-            <Grid item xs={2}>
-                <span>斜率：{gradient}</span>
+            <Grid item xs={3}>
+                <span>斜率：{gradient.toPrecision(5)}</span>
             </Grid>
-            <Grid item xs={2}>
-                <span>截距：{intercept}</span>
+            <Grid item xs={3}>
+                <span>截距：{intercept.toPrecision(5)}</span>
             </Grid>
-            <Grid item xs={2}>
-                <span>R^2：{R_square}</span>
+            <Grid item xs={3}>
+                <span>R^2：{R_square.toPrecision(5)}</span>
             </Grid>
 
         </Grid>
-
-
-
 
         <ReactECharts
             option={getOption()}
@@ -227,20 +235,20 @@ function LinearChart(props) {
         /></Container>)
 }
 
-export default function TabOne() {
+export default function TabTwo() {
     const classes = useStyles()
     const [da1, setDa1] = useState(0)
     const [da2, setDa2] = useState(0)
     const [ppm, setPpm] = useState(0)
-    // const [stdRatio, setStdRatio] = useState(2)
+    const [dilutionRatio, setdilutionRatio] = useState(1)
     const [statData, setStatData] = useState([])
-    const {stdRatio,setStdRatio} = useContext(StatContext)
-    const [showCharts, setShowCharts] = useState(false)
-    const [gradient, setGradient] = useState(0)
-    const [intercept, setintercept] = useState(0)
-    const [R_square, setR_square] = useState(0)
-
     const { params, setParams } = useContext(StatContext)
+    const [showCharts, setShowCharts] = useState(false)
+
+    const [gradient2, setGradient2] = useState(0)
+    const [intercept2, setintercept2] = useState(0)
+    const [R_square2, setR_square2] = useState(0)
+    
 
     function handleCaculateClick() {
         function getStatParam() {
@@ -266,15 +274,9 @@ export default function TabOne() {
                 }
                 let R_square = 1 - divide(SS_res, SS_tot)
 
-                setGradient(gradient)
-                setintercept(intercept)
-                setR_square(R_square)
-
-                setParams({
-                    'gradient': gradient,
-                    'intercept': intercept,
-                    'R_square': R_square
-                })
+                setGradient2(gradient)
+                setintercept2(intercept)
+                setR_square2(R_square)
             }
 
         }
@@ -301,32 +303,38 @@ export default function TabOne() {
                         <Input id="ppm" value={ppm} onChange={(e) => setPpm(e.target.value)} />
                     </FormControl>
                     <FormControl>
-                        <InputLabel htmlFor="stdRatio">标准差系数</InputLabel>
-                        <Input id="stdRatio" value={stdRatio} onChange={(e) => setStdRatio(e.target.value)} />
+                        <InputLabel htmlFor="dilutionRatio">稀释倍数</InputLabel>
+                        <Input id="dilutionRatio" value={dilutionRatio} onChange={(e) => setdilutionRatio(e.target.value)} />
                     </FormControl>
                 </form>
             </div>
 
 
             <Grid container spacing={3}>
-                <Grid item xs={3}>
-                    <Paper className={classes.paper}>浓度</Paper>
 
-                </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={2}>
                     <Paper className={classes.paper}>数据</Paper>
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={2}>
                     <Paper className={classes.paper}>比值</Paper>
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={2}>
                     <Paper className={classes.paper}>CV</Paper>
+                </Grid>
+                <Grid item xs={2}>
+                    <Paper className={classes.paper}>实测浓度</Paper>
+                </Grid>
+                <Grid item xs={2}>
+                    <Paper className={classes.paper}>对标浓度</Paper>
+                </Grid>
+                <Grid item xs={2}>
+                    <Paper className={classes.paper}>相对偏差</Paper>
                 </Grid>
             </Grid>
 
             <container>
                 {Array.from({ length: 10 }, (value, index) =>
-                    <DataForm index={index} className={classes.customForm} da1={da1} da2={da2} ppm={ppm} stdRatio={stdRatio} statData={statData} setStatData={setStatData}></DataForm>
+                    <DataForm index={index} className={classes.customForm} da1={da1} da2={da2} ppm={ppm} dilutionRatio={dilutionRatio} statData={statData} setStatData={setStatData}></DataForm>
                 )}
             </container>
 
@@ -342,8 +350,9 @@ export default function TabOne() {
 
 
             <Paper square>{
-                showCharts ? <LinearChart statData={statData} gradient={gradient} intercept={intercept} R_square={R_square}></LinearChart> : null
+                showCharts ? <LinearChart statData={statData} gradient={gradient2} intercept={intercept2} R_square={R_square2}></LinearChart> : null
             }
+
             </Paper>
 
         </Container>
