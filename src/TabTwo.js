@@ -107,7 +107,7 @@ function DataForm(props) {
         setInputConcentration(currentInputConc)
         
         setRelativeDeviation(divide(concentration - currentInputConc, currentInputConc))
-        let dataRow = [parseFloat(currentInputConc), parseFloat(concentration)]
+        let dataRow = { [index]: [parseFloat(currentInputConc), parseFloat(concentration)] }
         setStatObj({ ...statObj, ...dataRow })
     }
 
@@ -119,7 +119,6 @@ function DataForm(props) {
             setRelativeDeviation(divide(concentration - currentInputConc, currentInputConc))
             let dataRow ={[index]:[parseFloat(currentInputConc), parseFloat(concentration)]}
             setStatObj({ ...statObj, ...dataRow })
-            console.log(statObj)
         }
     }
     function handleDataClick(e) {

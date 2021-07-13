@@ -1,7 +1,7 @@
 /*
  * @Author: greatpie
  * @Date: 2021-07-08 06:00:46
- * @LastEditTime: 2021-07-13 19:44:16
+ * @LastEditTime: 2021-07-13 21:29:15
  * @LastEditors: greatpie
  * @FilePath: /alanysis-tool-electron/src/App.js
  */
@@ -78,7 +78,6 @@ function a11yProps(index) {
     'aria-controls': `simple-tabpanel-${index}`,
   }
 }
-
 export default function App() {
   const classes = useStyles()
   const [value, setValue] = useState(0)
@@ -87,7 +86,7 @@ export default function App() {
   }
 
 
-  const [stdRatio,setStdRatio] = useState(2)
+  const [stdRatio,setStdRatio] = useState(1)
   const [params,setParams] = useState({
     'gradient':1,
     'intercept':1,

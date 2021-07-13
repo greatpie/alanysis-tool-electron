@@ -1,7 +1,7 @@
 /*
  * @Author: greatpie
  * @Date: 2021-07-09 20:07:41
- * @LastEditTime: 2021-07-13 20:35:08
+ * @LastEditTime: 2021-07-13 21:09:48
  * @LastEditors: greatpie
  * @FilePath: /alanysis-tool-electron/main.js
  */
@@ -18,7 +18,7 @@ app.on('ready', () => {
         title:'Analysis Tool',
         width: 1024,
         height: 680,
-        frame: false,
+        // frame: false,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
