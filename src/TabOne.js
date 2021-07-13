@@ -6,6 +6,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Container, Grid, Paper, TextField, Button, InputLabel, FormControl, Input } from '@material-ui/core'
 import { divide, mean, std, abs, multiply, square } from 'mathjs'
 import { StatContext } from './content-manager'
+import { useForceUpdate } from './force-update'
 
 // electron remote
 const electron = window.require('electron');
@@ -42,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
 
 // DataForm
 function DataForm(props) {
-    const { index, className, da1, da2, ppm, stdRatio, statData, setStatData } = props
+    const { index, className, da1, da2, ppm, stdRatio, statObj, setStatObj } = props
 
     const [concentration, setConcentration] = useState(0)
     const [fileName, setFileName] = useState('选择文件')
@@ -50,11 +51,11 @@ function DataForm(props) {
     const [CV, setCV] = useState(0)
     function searchIntensity(da, dataList) {
         let intensity = 0
-        let range = ppm / 1000000
+        let range = multiply(divide(ppm, 1000000), da)
 
         dataList.forEach(item => {
             let targetDa = item[0]
-            if (targetDa >= da - range && targetDa <= da + range && intensity < item[1]) {
+            if (abs(targetDa - da) <= range && intensity < item[1]) {
                 intensity = item[1]
             }
         })
@@ -70,7 +71,7 @@ function DataForm(props) {
                 let rate = 0
                 content.split(/\r\n/).map(item => {
                     dataList.push(item.split(/\s+/))
-                    return 0
+                    return null
                 })
 
                 let da1Intensity = searchIntensity(da1, dataList)
@@ -85,17 +86,22 @@ function DataForm(props) {
         })
 
         await Promise.all(taskList).then((rateList) => {
-            let rateStd = std(rateList)
-            let rateMean = mean(rateList)
-            let rateListFiltered = rateList.filter(rate => abs(rate - rateMean) <= multiply(rateStd, stdRatio))
-            rateStd = std(rateListFiltered)
-            rateMean = mean(rateListFiltered)
-            let cv = divide(rateStd, rateMean)
-            setRateMean(rateMean)
-            setCV(cv)
+            rateList = rateList.filter(rate => rate)
+            if (rateList.length > 0) {
 
-            setStatData([...statData, [rateMean, parseFloat(concentration)]])
-            console.log(statData)
+                let rateStd = std(rateList)
+                let rateMean = mean(rateList)
+                let rateListFiltered = rateList.filter(rate => abs(rate - rateMean) <= multiply(rateStd, stdRatio))
+                rateStd = std(rateListFiltered)
+                rateMean = mean(rateListFiltered)
+                let cv = divide(rateStd, rateMean)
+                setRateMean(rateMean)
+                setCV(cv)
+                console.log(statObj)
+                let dataRow = { [index]: [rateMean, parseFloat(concentration)] }
+                setStatObj({ ...statObj, ...dataRow })
+            }
+
         })
 
     }
@@ -141,11 +147,11 @@ function DataForm(props) {
 }
 
 function LinearChart(props) {
-    const { statData, gradient,intercept,R_square} = props
-    
+    const { statData, gradient, intercept, R_square } = props
+
 
     function getOption() {
-        
+
         let option = {
             dataset: [{
                 source: statData
@@ -234,24 +240,36 @@ export default function TabOne() {
     const [ppm, setPpm] = useState(0)
     // const [stdRatio, setStdRatio] = useState(2)
     const [statData, setStatData] = useState([])
-    const {stdRatio,setStdRatio} = useContext(StatContext)
+    const [statObj, setStatObj] = useState({})
+    const { stdRatio, setStdRatio } = useContext(StatContext)
     const [showCharts, setShowCharts] = useState(false)
     const [gradient, setGradient] = useState(0)
     const [intercept, setintercept] = useState(0)
     const [R_square, setR_square] = useState(0)
 
     const { params, setParams } = useContext(StatContext)
+    
+    const [refresh, setRefresh] = useState(false);
+
+    
+    function handleRefreshClick() {
+        window.location.reload()
+    }
+
 
     function handleCaculateClick() {
         function getStatParam() {
-            if (statData.length > 0) {
-                let myRegression = ecStat.regression('linear', statData)
+            let statList = Object.values(statObj)
+
+            setStatData(statList)
+            if (statList.length > 0) {
+                let myRegression = ecStat.regression('linear', statList)
                 let gradient = myRegression.parameter['gradient']
                 let intercept = myRegression.parameter['intercept']
 
                 let y_matrix = []
                 let f_matrix = []
-                statData.forEach(item => {
+                statList.forEach(item => {
                     let f = item[0] * gradient + intercept
                     y_matrix.push(item[1])
                     f_matrix.push(f)
@@ -261,8 +279,8 @@ export default function TabOne() {
                 let SS_tot = 0
                 let SS_res = 0
                 for (let i = 0; i < y_matrix.length; i++) {
-                    SS_tot = square(y_matrix[i] - y_mean)
-                    SS_res = square(y_matrix[i] - f_matrix[i])
+                    SS_tot += square(y_matrix[i] - y_mean)
+                    SS_res += square(y_matrix[i] - f_matrix[i])
                 }
                 let R_square = 1 - divide(SS_res, SS_tot)
 
@@ -282,7 +300,7 @@ export default function TabOne() {
         setShowCharts(true)
 
     }
-
+    
     return (
 
         <Container>
@@ -326,7 +344,7 @@ export default function TabOne() {
 
             <container>
                 {Array.from({ length: 10 }, (value, index) =>
-                    <DataForm index={index} className={classes.customForm} da1={da1} da2={da2} ppm={ppm} stdRatio={stdRatio} statData={statData} setStatData={setStatData}></DataForm>
+                    <DataForm index={index} className={classes.customForm} da1={da1} da2={da2} ppm={ppm} stdRatio={stdRatio} statObj={statObj} setStatObj={setStatObj}></DataForm>
                 )}
             </container>
 
@@ -336,6 +354,11 @@ export default function TabOne() {
                 <Grid item xs={3}>
                     <Button label='caculate' variant="contained" color="primary" size='large' onClick={handleCaculateClick}>
                         计  算
+                    </Button>
+                </Grid>
+                <Grid item xs={3}>
+                    <Button label='refresh' variant="contained" color="primary" size='large' onClick={handleRefreshClick}>
+                        重置
                     </Button>
                 </Grid>
             </Grid>

@@ -1,7 +1,7 @@
 /*
  * @Author: greatpie
  * @Date: 2021-07-09 20:07:41
- * @LastEditTime: 2021-07-12 10:53:46
+ * @LastEditTime: 2021-07-12 21:35:11
  * @LastEditors: greatpie
  * @FilePath: /alanysis-tool-electron/main.js
  */
@@ -27,4 +27,8 @@ app.on('ready', () => {
     const urlLocation = isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, "./build/index.html")}`
     mainWindow.loadURL(urlLocation)
     mainWindow.webContents.openDevTools()
+})
+
+app.on('window-all-closed', (evt) => {
+    app.quit()
 })

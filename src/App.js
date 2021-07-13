@@ -1,7 +1,7 @@
 /*
  * @Author: greatpie
  * @Date: 2021-07-08 06:00:46
- * @LastEditTime: 2021-07-12 17:02:52
+ * @LastEditTime: 2021-07-13 19:44:16
  * @LastEditors: greatpie
  * @FilePath: /alanysis-tool-electron/src/App.js
  */
@@ -54,11 +54,14 @@ function TabPanel(props) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && (
+      {/* {value === index && (
         <Box p={3}>
           <Typography>{children}</Typography>
         </Box>
-      )}
+      )} */}
+      <Box p={3}>
+        <Typography>{children}</Typography>
+      </Box>
     </div>
   );
 }
@@ -83,9 +86,7 @@ export default function App() {
     setValue(newValue)
   }
 
-  const [gradient, setGradient] = useState(0)
-  const [intercept, setintercept] = useState(0)
-  const [R_square, setR_square] = useState(0)
+
   const [stdRatio,setStdRatio] = useState(2)
   const [params,setParams] = useState({
     'gradient':1,

@@ -77,7 +77,7 @@ function DataForm(props) {
 
                 let da1Intensity = searchIntensity(da1, dataList)
                 let da2Intensity = searchIntensity(da2, dataList)
-                if (da1Intensity > 0 && da2Intensity > 0) {
+                if (da1Intensity > 0 || da2Intensity > 0) {
                     rate = divide(da1Intensity, da2Intensity)
                 }
                 return rate
@@ -106,6 +106,18 @@ function DataForm(props) {
         setInputConcentration(e.target.value)
         setRelativeDeviation(divide(concentration - inputConcentration, inputConcentration))
         setStatData([...statData, [parseFloat(inputConcentration), parseFloat(concentration)]])
+    }
+
+    function handleKeyUp(e){
+        e.preventDefault()
+        if (e.keyCode === 13) {
+            setInputConcentration(e.target.value)
+            console.log(concentration)
+            console.log(inputConcentration)
+            let temp = divide(concentration - inputConcentration, inputConcentration)
+            setRelativeDeviation(divide(concentration - inputConcentration, inputConcentration))
+            setStatData([...statData, [parseFloat(inputConcentration), parseFloat(concentration)]])
+        }
     }
     function handleDataClick(e) {
 
@@ -142,7 +154,7 @@ function DataForm(props) {
                 <TextField className="CV" label='CV' value={CV} variant="outlined" /></Grid>
             <Grid item xs={2}><TextField label='实测浓度' value={concentration} variant="outlined" />
             </Grid>
-            <Grid item xs={2}><TextField label='对标浓度' value={inputConcentration} onChange={handleInputConcChange} variant="outlined" />
+            <Grid item xs={2}><TextField label='对标浓度' value={inputConcentration} onChange={(e)=>setInputConcentration(e.target.value)} onKeyUp={handleKeyUp} variant="outlined" />
             </Grid>
             <Grid item xs={2}><TextField label='相对偏差' value={relativeDeviation} variant="outlined" />
             </Grid>
@@ -269,8 +281,8 @@ export default function TabTwo() {
                 let SS_tot = 0
                 let SS_res = 0
                 for (let i = 0; i < y_matrix.length; i++) {
-                    SS_tot = square(y_matrix[i] - y_mean)
-                    SS_res = square(y_matrix[i] - f_matrix[i])
+                    SS_tot += square(y_matrix[i] - y_mean)
+                    SS_res += square(y_matrix[i] - f_matrix[i])
                 }
                 let R_square = 1 - divide(SS_res, SS_tot)
 
