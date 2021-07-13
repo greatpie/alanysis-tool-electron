@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
 
 // DataForm
 function DataForm(props) {
-    const { index, className, da1, da2, ppm, dilutionRatio,statData,setStatData} = props
+    const { index, className, da1, da2, ppm, dilutionRatio, statObj, setStatObj} = props
     const [concentration, setConcentration] = useState(0)
     const [inputConcentration, setInputConcentration] = useState(0)
     const [relativeDeviation, setRelativeDeviation] = useState(0)
@@ -103,20 +103,23 @@ function DataForm(props) {
     }
     function handleInputConcChange(e) {
         e.preventDefault()
-        setInputConcentration(e.target.value)
-        setRelativeDeviation(divide(concentration - inputConcentration, inputConcentration))
-        setStatData([...statData, [parseFloat(inputConcentration), parseFloat(concentration)]])
+        let currentInputConc = e.target.value
+        setInputConcentration(currentInputConc)
+        
+        setRelativeDeviation(divide(concentration - currentInputConc, currentInputConc))
+        let dataRow = [parseFloat(currentInputConc), parseFloat(concentration)]
+        setStatObj({ ...statObj, ...dataRow })
     }
 
     function handleKeyUp(e){
         e.preventDefault()
         if (e.keyCode === 13) {
-            setInputConcentration(e.target.value)
-            console.log(concentration)
-            console.log(inputConcentration)
-            let temp = divide(concentration - inputConcentration, inputConcentration)
-            setRelativeDeviation(divide(concentration - inputConcentration, inputConcentration))
-            setStatData([...statData, [parseFloat(inputConcentration), parseFloat(concentration)]])
+            let currentInputConc = e.target.value
+            setInputConcentration(currentInputConc)
+            setRelativeDeviation(divide(concentration - currentInputConc, currentInputConc))
+            let dataRow ={[index]:[parseFloat(currentInputConc), parseFloat(concentration)]}
+            setStatObj({ ...statObj, ...dataRow })
+            console.log(statObj)
         }
     }
     function handleDataClick(e) {
@@ -154,7 +157,7 @@ function DataForm(props) {
                 <TextField className="CV" label='CV' value={CV} variant="outlined" /></Grid>
             <Grid item xs={2}><TextField label='实测浓度' value={concentration} variant="outlined" />
             </Grid>
-            <Grid item xs={2}><TextField label='对标浓度' value={inputConcentration} onChange={(e)=>setInputConcentration(e.target.value)} onKeyUp={handleKeyUp} variant="outlined" />
+            <Grid item xs={2}><TextField label='对标浓度' value={inputConcentration} onChange={handleInputConcChange} onKeyUp={handleKeyUp} variant="outlined" />
             </Grid>
             <Grid item xs={2}><TextField label='相对偏差' value={relativeDeviation} variant="outlined" />
             </Grid>
@@ -251,9 +254,10 @@ export default function TabTwo() {
     const classes = useStyles()
     const [da1, setDa1] = useState(0)
     const [da2, setDa2] = useState(0)
-    const [ppm, setPpm] = useState(0)
+    const [ppm, setPpm] = useState(1000)
     const [dilutionRatio, setdilutionRatio] = useState(1)
     const [statData, setStatData] = useState([])
+    const [statObj, setStatObj] = useState({})
     const { params, setParams } = useContext(StatContext)
     const [showCharts, setShowCharts] = useState(false)
 
@@ -264,14 +268,18 @@ export default function TabTwo() {
 
     function handleCaculateClick() {
         function getStatParam() {
-            if (statData.length > 0) {
-                let myRegression = ecStat.regression('linear', statData)
+            let statList = Object.values(statObj)
+
+            setStatData(statList)
+
+            if (statList.length > 0) {
+                let myRegression = ecStat.regression('linear', statList)
                 let gradient = myRegression.parameter['gradient']
                 let intercept = myRegression.parameter['intercept']
 
                 let y_matrix = []
                 let f_matrix = []
-                statData.forEach(item => {
+                statList.forEach(item => {
                     let f = item[0] * gradient + intercept
                     y_matrix.push(item[1])
                     f_matrix.push(f)
@@ -346,7 +354,7 @@ export default function TabTwo() {
 
             <container>
                 {Array.from({ length: 10 }, (value, index) =>
-                    <DataForm index={index} className={classes.customForm} da1={da1} da2={da2} ppm={ppm} dilutionRatio={dilutionRatio} statData={statData} setStatData={setStatData}></DataForm>
+                    <DataForm index={index} className={classes.customForm} da1={da1} da2={da2} ppm={ppm} dilutionRatio={dilutionRatio} statObj={statObj} setStatObj={setStatObj}></DataForm>
                 )}
             </container>
 

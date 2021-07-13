@@ -6,7 +6,6 @@ import { makeStyles } from '@material-ui/core/styles'
 import { Container, Grid, Paper, TextField, Button, InputLabel, FormControl, Input } from '@material-ui/core'
 import { divide, mean, std, abs, multiply, square } from 'mathjs'
 import { StatContext } from './content-manager'
-import { useForceUpdate } from './force-update'
 
 // electron remote
 const electron = window.require('electron');
@@ -97,7 +96,7 @@ function DataForm(props) {
                 let cv = divide(rateStd, rateMean)
                 setRateMean(rateMean)
                 setCV(cv)
-                console.log(statObj)
+            
                 let dataRow = { [index]: [rateMean, parseFloat(concentration)] }
                 setStatObj({ ...statObj, ...dataRow })
             }
@@ -237,7 +236,7 @@ export default function TabOne() {
     const classes = useStyles()
     const [da1, setDa1] = useState(0)
     const [da2, setDa2] = useState(0)
-    const [ppm, setPpm] = useState(0)
+    const [ppm, setPpm] = useState(1000)
     // const [stdRatio, setStdRatio] = useState(2)
     const [statData, setStatData] = useState([])
     const [statObj, setStatObj] = useState({})

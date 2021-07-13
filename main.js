@@ -1,11 +1,11 @@
 /*
  * @Author: greatpie
  * @Date: 2021-07-09 20:07:41
- * @LastEditTime: 2021-07-12 21:35:11
+ * @LastEditTime: 2021-07-13 20:35:08
  * @LastEditors: greatpie
  * @FilePath: /alanysis-tool-electron/main.js
  */
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow,Menu} = require('electron')
 const isDev = require('electron-is-dev')
 const path = require('path')
 require('@electron/remote/main').initialize()
@@ -13,10 +13,12 @@ require('@electron/remote/main').initialize()
 let mainWindow;
 
 app.on('ready', () => {
+    Menu.setApplicationMenu(null)
     mainWindow = new BrowserWindow({
         title:'Analysis Tool',
         width: 1024,
         height: 680,
+        frame: false,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
@@ -24,9 +26,14 @@ app.on('ready', () => {
             preload: path.join(__dirname, 'preload.js')
         }
     })
+
     const urlLocation = isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, "./build/index.html")}`
+
+    if(isDev){
+        mainWindow.webContents.openDevTools()
+    }
     mainWindow.loadURL(urlLocation)
-    mainWindow.webContents.openDevTools()
+    
 })
 
 app.on('window-all-closed', (evt) => {
