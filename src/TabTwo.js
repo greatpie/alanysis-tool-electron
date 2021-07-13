@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
 
 // DataForm
 function DataForm(props) {
-    const { index, className, da1, da2, ppm, dilutionRatio, statObj, setStatObj} = props
+    const { index, className, da1, da2, ppm, dilutionRatio, statObj, setStatObj } = props
     const [concentration, setConcentration] = useState(0)
     const [inputConcentration, setInputConcentration] = useState(0)
     const [relativeDeviation, setRelativeDeviation] = useState(0)
@@ -52,17 +52,16 @@ function DataForm(props) {
     const { params, stdRatio } = useContext(StatContext)
     function searchIntensity(da, dataList) {
         let intensity = 0
-        let range = ppm / 1000000
+        let range = multiply(divide(ppm, 1000000), da)
 
         dataList.forEach(item => {
             let targetDa = item[0]
-            if (targetDa >= da - range && targetDa <= da + range && intensity < item[1]) {
+            if (abs(targetDa - da) <= range && intensity < item[1]) {
                 intensity = item[1]
             }
         })
         return intensity
     }
-
     async function getRateMean(filePaths) {
         let taskList = []
         filePaths.forEach(filePath => {
@@ -72,7 +71,7 @@ function DataForm(props) {
                 let rate = 0
                 content.split(/\r\n/).map(item => {
                     dataList.push(item.split(/\s+/))
-                    return 0
+                    return null
                 })
 
                 let da1Intensity = searchIntensity(da1, dataList)
@@ -87,16 +86,20 @@ function DataForm(props) {
         })
 
         await Promise.all(taskList).then((rateList) => {
-            let rateStd = std(rateList)
-            let rateMean = mean(rateList)
-            let rateListFiltered = rateList.filter(rate => abs(rate - rateMean) <= multiply(rateStd, stdRatio))
-            rateStd = std(rateListFiltered)
-            rateMean = mean(rateListFiltered)
-            let cv = divide(rateStd, rateMean)
-            let concentration = (params['gradient'] * rateMean + params['intercept']) * dilutionRatio
-            setRateMean(rateMean)
-            setCV(cv)
-            setConcentration(concentration)
+            rateList = rateList.filter(rate => rate)
+            if (rateList.length > 0) {
+                let rateStd = std(rateList)
+                let rateMean = mean(rateList)
+                let rateListFiltered = rateList.filter(rate => abs(rate - rateMean) <= multiply(rateStd, stdRatio))
+                rateStd = std(rateListFiltered)
+                rateMean = mean(rateListFiltered)
+                let cv = divide(rateStd, rateMean)
+                let concentration = (params['gradient'] * rateMean + params['intercept']) * dilutionRatio
+                setRateMean(rateMean)
+                setCV(cv)
+                setConcentration(concentration)
+            }
+
 
         })
 
@@ -105,19 +108,19 @@ function DataForm(props) {
         e.preventDefault()
         let currentInputConc = e.target.value
         setInputConcentration(currentInputConc)
-        
+
         setRelativeDeviation(divide(concentration - currentInputConc, currentInputConc))
         let dataRow = { [index]: [parseFloat(currentInputConc), parseFloat(concentration)] }
         setStatObj({ ...statObj, ...dataRow })
     }
 
-    function handleKeyUp(e){
+    function handleKeyUp(e) {
         e.preventDefault()
         if (e.keyCode === 13) {
             let currentInputConc = e.target.value
             setInputConcentration(currentInputConc)
             setRelativeDeviation(divide(concentration - currentInputConc, currentInputConc))
-            let dataRow ={[index]:[parseFloat(currentInputConc), parseFloat(concentration)]}
+            let dataRow = { [index]: [parseFloat(currentInputConc), parseFloat(concentration)] }
             setStatObj({ ...statObj, ...dataRow })
         }
     }
@@ -165,8 +168,8 @@ function DataForm(props) {
 }
 
 function LinearChart(props) {
-    const { statData,gradient,intercept,R_square} = props
-  
+    const { statData, gradient, intercept, R_square } = props
+
 
 
     function getOption() {
@@ -263,7 +266,7 @@ export default function TabTwo() {
     const [gradient2, setGradient2] = useState(0)
     const [intercept2, setintercept2] = useState(0)
     const [R_square2, setR_square2] = useState(0)
-    
+
 
     function handleCaculateClick() {
         function getStatParam() {
