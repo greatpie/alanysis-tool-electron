@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useState, useContext } from 'react'
 import ReactECharts from 'echarts-for-react'
 import * as echarts from 'echarts'
 import ecStat from 'echarts-stat'
@@ -49,15 +49,18 @@ function DataForm(props) {
     const [rateMean, setRateMean] = useState(0)
     const [CV, setCV] = useState(0)
     function searchIntensity(da, dataList) {
-        let intensity = 0
-        let range = multiply(divide(ppm, 1000000), da)
 
-        dataList.forEach(item => {
-            let targetDa = item[0]
-            if (abs(targetDa - da) <= range && intensity < item[1]) {
-                intensity = item[1]
+        let range = multiply(divide(ppm, 1000000), da)
+        let intensity = 0
+        for (let item of dataList) {
+           
+            let targetDa = parseFloat(item[0])
+            let targetIntensity = parseFloat(item[1])
+            if (abs(targetDa - da) <= range && intensity <= targetIntensity) {
+                intensity = targetIntensity
+                console.log(intensity)
             }
-        })
+        }
         return intensity
     }
 
@@ -85,6 +88,7 @@ function DataForm(props) {
         })
 
         await Promise.all(taskList).then((rateList) => {
+            console.log(rateList)
             rateList = rateList.filter(rate => rate)
             if (rateList.length > 0) {
 
@@ -96,7 +100,7 @@ function DataForm(props) {
                 let cv = divide(rateStd, rateMean)
                 setRateMean(rateMean)
                 setCV(cv)
-            
+
                 let dataRow = { [index]: [rateMean, parseFloat(concentration)] }
                 setStatObj({ ...statObj, ...dataRow })
             }
@@ -247,10 +251,10 @@ export default function TabOne() {
     const [R_square, setR_square] = useState(0)
 
     const { params, setParams } = useContext(StatContext)
-    
+
     const [refresh, setRefresh] = useState(false);
 
-    
+
     function handleRefreshClick() {
         window.location.reload()
     }
@@ -299,7 +303,7 @@ export default function TabOne() {
         setShowCharts(true)
 
     }
-    
+
     return (
 
         <Container>

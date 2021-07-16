@@ -51,15 +51,18 @@ function DataForm(props) {
     const [CV, setCV] = useState(0)
     const { params, stdRatio } = useContext(StatContext)
     function searchIntensity(da, dataList) {
-        let intensity = 0
-        let range = multiply(divide(ppm, 1000000), da)
 
-        dataList.forEach(item => {
-            let targetDa = item[0]
-            if (abs(targetDa - da) <= range && intensity < item[1]) {
-                intensity = item[1]
+        let range = multiply(divide(ppm, 1000000), da)
+        let intensity = 0
+        for (let item of dataList) {
+
+            let targetDa = parseFloat(item[0])
+            let targetIntensity = parseFloat(item[1])
+            if (abs(targetDa - da) <= range && intensity <= targetIntensity) {
+                intensity = targetIntensity
+                console.log(intensity)
             }
-        })
+        }
         return intensity
     }
     async function getRateMean(filePaths) {
@@ -76,7 +79,7 @@ function DataForm(props) {
 
                 let da1Intensity = searchIntensity(da1, dataList)
                 let da2Intensity = searchIntensity(da2, dataList)
-                if (da1Intensity > 0 || da2Intensity > 0) {
+                if (da1Intensity > 0 && da2Intensity > 0) {
                     rate = divide(da1Intensity, da2Intensity)
                 }
                 return rate
@@ -86,6 +89,7 @@ function DataForm(props) {
         })
 
         await Promise.all(taskList).then((rateList) => {
+            console.log(rateList)
             rateList = rateList.filter(rate => rate)
             if (rateList.length > 0) {
                 let rateStd = std(rateList)
@@ -94,9 +98,11 @@ function DataForm(props) {
                 rateStd = std(rateListFiltered)
                 rateMean = mean(rateListFiltered)
                 let cv = divide(rateStd, rateMean)
-                let concentration = (params['gradient'] * rateMean + params['intercept']) * dilutionRatio
+                
+             
                 setRateMean(rateMean)
                 setCV(cv)
+                let concentration = (params['gradient'] * rateMean + params['intercept']) * dilutionRatio
                 setConcentration(concentration)
             }
 
