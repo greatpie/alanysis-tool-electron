@@ -1,7 +1,7 @@
 /*
  * @Author: greatpie
  * @Date: 2021-07-08 06:00:46
- * @LastEditTime: 2021-07-13 21:29:15
+ * @LastEditTime: 2021-07-26 12:08:06
  * @LastEditors: greatpie
  * @FilePath: /alanysis-tool-electron/src/App.js
  */
@@ -15,7 +15,7 @@ import { Container, AppBar, Tabs, Tab, Typography, Box } from '@material-ui/core
 import TabOne from './TabOne'
 import { StatContext } from './content-manager'
 import TabTwo from './TabTwo'
-
+import { uniqueId } from 'lodash'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -78,22 +78,31 @@ function a11yProps(index) {
     'aria-controls': `simple-tabpanel-${index}`,
   }
 }
+
+const generateUniqueKey = () => `child_${uniqueId()}`
+
+
 export default function App() {
   const classes = useStyles()
   const [value, setValue] = useState(0)
   const handleChange = (event, newValue) => {
     setValue(newValue)
   }
-
-
-  const [stdRatio,setStdRatio] = useState(1)
-  const [params,setParams] = useState({
-    'gradient':1,
-    'intercept':1,
-    'R_square':0,
+  const [stdRatio, setStdRatio] = useState(1)
+  const [params, setParams] = useState({
+    'gradient': 1,
+    'intercept': 1,
+    'R_square': 0,
   })
+
+  const [tabOneKey, setTabOneKey] = React.useState(generateUniqueKey())
+  const [tabTwoKey, setTabTwoKey] = React.useState(generateUniqueKey());
+
+  const resetTabOne = () => setTabOneKey(generateUniqueKey())
+  const resetTabTwo = () => setTabTwoKey(generateUniqueKey())
+
   return (
-    <StatContext.Provider value={{ params, setParams, stdRatio, setStdRatio}}>
+    <StatContext.Provider value={{ params, setParams, stdRatio, setStdRatio }}>
       <div className={classes.root}>
         <Container maxWidth="md">
           <AppBar position="static">
@@ -104,10 +113,10 @@ export default function App() {
             </Tabs>
           </AppBar>
           <TabPanel value={value} index={0}>
-            <TabOne></TabOne>
+            <TabOne key={tabOneKey} doReset={resetTabOne}></TabOne>
           </TabPanel>
           <TabPanel value={value} index={1}>
-            <TabTwo></TabTwo>
+            <TabTwo key={tabTwoKey} doReset={resetTabTwo}></TabTwo>
           </TabPanel>
         </Container>
 

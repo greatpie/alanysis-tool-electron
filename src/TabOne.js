@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext,useRef } from 'react'
 import ReactECharts from 'echarts-for-react'
 import * as echarts from 'echarts'
 import ecStat from 'echarts-stat'
@@ -236,7 +236,8 @@ function LinearChart(props) {
         /></Container>)
 }
 
-export default function TabOne() {
+export default function TabOne(props) {
+    const myRef = useRef(null)
     const classes = useStyles()
     const [da1, setDa1] = useState(0)
     const [da2, setDa2] = useState(0)
@@ -252,11 +253,11 @@ export default function TabOne() {
 
     const { params, setParams } = useContext(StatContext)
 
-    const [refresh, setRefresh] = useState(false);
+    const {doReset} = props
 
 
     function handleRefreshClick() {
-        window.location.reload()
+        doReset()
     }
 
 
@@ -306,7 +307,7 @@ export default function TabOne() {
 
     return (
 
-        <Container>
+        <Container ref={myRef}>
             <div className={classes.inputVaules}>
                 <form className={classes.customForm} noValidate autoComplete="off">
                     <FormControl>

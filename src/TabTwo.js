@@ -258,7 +258,7 @@ function LinearChart(props) {
         /></Container>)
 }
 
-export default function TabTwo() {
+export default function TabTwo(props) {
     const classes = useStyles()
     const [da1, setDa1] = useState(0)
     const [da2, setDa2] = useState(0)
@@ -273,6 +273,12 @@ export default function TabTwo() {
     const [intercept2, setintercept2] = useState(0)
     const [R_square2, setR_square2] = useState(0)
 
+    const { doReset } = props
+
+
+    function handleRefreshClick() {
+        doReset()
+    }
 
     function handleCaculateClick() {
         function getStatParam() {
@@ -372,6 +378,11 @@ export default function TabTwo() {
                 <Grid item xs={3}>
                     <Button label='caculate' variant="contained" color="primary" size='large' onClick={handleCaculateClick}>
                         计  算
+                    </Button>
+                </Grid>
+                <Grid item xs={3}>
+                    <Button label='refresh' variant="contained" color="primary" size='large' onClick={handleRefreshClick}>
+                        重置
                     </Button>
                 </Grid>
             </Grid>
