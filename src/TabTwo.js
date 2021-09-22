@@ -60,7 +60,6 @@ function DataForm(props) {
             let targetIntensity = parseFloat(item[1])
             if (abs(targetDa - da) <= range && intensity <= targetIntensity) {
                 intensity = targetIntensity
-                console.log(intensity)
             }
         }
         return intensity
@@ -89,7 +88,6 @@ function DataForm(props) {
         })
 
         await Promise.all(taskList).then((rateList) => {
-            console.log(rateList)
             rateList = rateList.filter(rate => rate)
             if (rateList.length > 0) {
                 let rateStd = std(rateList)

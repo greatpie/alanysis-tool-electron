@@ -8,3 +8,6 @@
 # Analysis Tool 
 
 Developed with React and Electron.
+
+## Todos
+Refactor with state manage tools.

@@ -58,7 +58,6 @@ function DataForm(props) {
             let targetIntensity = parseFloat(item[1])
             if (abs(targetDa - da) <= range && intensity <= targetIntensity) {
                 intensity = targetIntensity
-                console.log(intensity)
             }
         }
         return intensity
