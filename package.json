@@ -5,15 +5,12 @@
   "main": "main.js",
   "author": "pie",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
     "dev": "concurrently \"wait-on http://localhost:3000 && electron .\" \"cross-env BROWSER=none npm start\"",
+    "build:windows": "electron-builder build --windows --x64",
     "pack": "electron-builder --dir",
-    "prepack": "npm run build",
+    "prepack": "yarn run build",
     "dist": "electron-builder",
-    "predist": "npm run build"
+    "predist": "yarn run build"
   },
   "homepage": "./",
   "build": {
