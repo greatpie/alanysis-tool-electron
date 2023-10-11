@@ -62,7 +62,7 @@ function DataForm(props) {
                 intensity = targetIntensity
             }
         }
-        return intensity
+        return intensity.toFixed(2)
     }
     async function getRateMean(filePaths) {
         let taskList = []
@@ -81,7 +81,7 @@ function DataForm(props) {
                 if (da1Intensity > 0 && da2Intensity > 0) {
                     rate = divide(da1Intensity, da2Intensity)
                 }
-                return rate
+                return rate.toFixed(2)
             })
             taskList.push(task)
 
@@ -95,12 +95,12 @@ function DataForm(props) {
                 let rateListFiltered = rateList.filter(rate => abs(rate - rateMean) <= multiply(rateStd, stdRatio))
                 rateStd = std(rateListFiltered)
                 rateMean = mean(rateListFiltered)
-                let cv = divide(rateStd, rateMean)
+                let cv = divide(rateStd, rateMean).toFixed(2)
                 
              
                 setRateMean(rateMean)
                 setCV(cv)
-                let concentration = (params['gradient'] * rateMean + params['intercept']) * dilutionRatio
+                let concentration = ((params['gradient'] * rateMean + params['intercept']) * dilutionRatio).toFixed(2)
                 setConcentration(concentration)
             }
 

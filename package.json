@@ -17,9 +17,9 @@
   },
   "homepage": "./",
   "build": {
-    "appId": "tigerHee appId",
-    "productName": "electron脚手架",
-    "copyright": "Copyright © 2019 ${author}",
+    "appId": "233233",
+    "productName": "Tailai Anylysis Tool",
+    "copyright": "Copyright © 2023 greatpie",
     "files": [
       "build/**/*",
       "node_modules/**/*",
@@ -96,6 +96,7 @@
     "concurrently": "^6.2.0",
     "cross-env": "^7.0.3",
     "electron": "^13.1.6",
+    "electron-builder": "^24.6.4",
     "electron-is-dev": "^2.0.0",
     "wait-on": "^6.0.0"
   }
