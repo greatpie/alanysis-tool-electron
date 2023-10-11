@@ -9,5 +9,8 @@
 
 Developed with React and Electron.
 
-## Todos
-Refactor with state manage tools.
+## Build Windows
+```
+yarn build:windows
+```
+
