@@ -10,7 +10,11 @@
     "pack": "electron-builder --dir",
     "prepack": "yarn run build",
     "dist": "electron-builder",
-    "predist": "yarn run build"
+    "predist": "yarn run build",
+     "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
   "homepage": "./",
   "build": {

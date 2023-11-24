@@ -90,11 +90,11 @@ function DataForm(props) {
         await Promise.all(taskList).then((rateList) => {
             rateList = rateList.filter(rate => rate)
             if (rateList.length > 0) {
-                let rateStd = std(rateList)
-                let rateMean = mean(rateList)
+                let rateStd = std(rateList).toFixed(2)
+                let rateMean = mean(rateList).toFixed(2)
                 let rateListFiltered = rateList.filter(rate => abs(rate - rateMean) <= multiply(rateStd, stdRatio))
-                rateStd = std(rateListFiltered)
-                rateMean = mean(rateListFiltered)
+                rateStd = std(rateListFiltered).toFixed(2)
+                rateMean = mean(rateListFiltered).toFixed(2)
                 let cv = divide(rateStd, rateMean).toFixed(2)
                 
              
@@ -364,11 +364,11 @@ export default function TabTwo(props) {
                 </Grid>
             </Grid>
 
-            <container>
+            <div>
                 {Array.from({ length: 10 }, (value, index) =>
                     <DataForm index={index} className={classes.customForm} da1={da1} da2={da2} ppm={ppm} dilutionRatio={dilutionRatio} statObj={statObj} setStatObj={setStatObj}></DataForm>
                 )}
-            </container>
+            </div>
 
 
 
