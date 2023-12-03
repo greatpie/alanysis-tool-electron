@@ -109,7 +109,6 @@ export default function App() {
             <Tabs value={value} onChange={handleChange} aria-label="simple tabs">
               <Tab label="标准曲线分析" {...a11yProps(0)} />
               <Tab label="定量分析" {...a11yProps(1)} />
-
             </Tabs>
           </AppBar>
           <TabPanel value={value} index={0}>
