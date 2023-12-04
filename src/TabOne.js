@@ -16,6 +16,8 @@ import {
 import { divide, mean, std, abs, multiply, square, round } from 'mathjs'
 import { StatContext } from './content-manager'
 
+import log from 'electron-log/renderer'
+
 // electron remote
 const electron = window.require('electron')
 const remote = electron.remote
@@ -94,16 +96,18 @@ function DataForm(props) {
     })
 
     await Promise.all(taskList).then((rateList) => {
-      rateList = rateList.filter((rate) => rate)
+     
+       log.info(rateList)
       if (rateList.length > 0) {
         let rateStd = std(rateList)
         let rateMean = mean(rateList)
+        // remove filter
+        // let rateListFiltered = rateList.filter(
+        //   (rate) => abs(rate - rateMean) <= multiply(rateStd, stdRatio)
+        // )
+        // rateStd = std(rateListFiltered)
+        // rateMean = mean(rateListFiltered)
 
-        let rateListFiltered = rateList.filter(
-          (rate) => abs(rate - rateMean) <= multiply(rateStd, stdRatio)
-        )
-        rateStd = std(rateListFiltered)
-        rateMean = mean(rateListFiltered)
         rateStd = round(rateStd, 2)
         rateMean = round(rateMean, 2)
 

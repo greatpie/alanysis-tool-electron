@@ -10,6 +10,11 @@ const isDev = require('electron-is-dev')
 const path = require('path')
 require('@electron/remote/main').initialize()
 
+const log = require('electron-log')
+// Optional, initialize the logger for any renderer process
+log.initialize({ preload: true })
+log.info('Log from the main process')
+
 let mainWindow;
 
 app.on('ready', () => {

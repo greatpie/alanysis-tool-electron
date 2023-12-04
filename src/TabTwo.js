@@ -103,15 +103,18 @@ function DataForm(props) {
     })
 
     await Promise.all(taskList).then((rateList) => {
-      rateList = rateList.filter((rate) => rate)
+      
+      // rateList = rateList.filter((rate) => rate)
       if (rateList.length > 0) {
         let rateStd = std(rateList)
         let rateMean = mean(rateList)
-        let rateListFiltered = rateList.filter(
-          (rate) => abs(rate - rateMean) <= multiply(rateStd, stdRatio)
-        )
-        rateStd = std(rateListFiltered)
-        rateMean = mean(rateListFiltered)
+        // remove filter
+        // let rateListFiltered = rateList.filter(
+        //   (rate) => abs(rate - rateMean) <= multiply(rateStd, stdRatio)
+        // )
+        // process.stdout.write(rateListFiltered)
+        // rateStd = std(rateListFiltered)
+        // rateMean = mean(rateListFiltered)
         rateStd = round(rateStd, 2)
         rateMean = round(rateMean, 2)
         let cv = divide(rateStd, rateMean)
@@ -125,6 +128,7 @@ function DataForm(props) {
       }
     })
   }
+
   function handleInputConcChange(e) {
     e.preventDefault()
     let currentInputConc = e.target.value
